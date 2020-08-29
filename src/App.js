@@ -8,10 +8,11 @@ import Heading from '@ckeditor/ckeditor5-heading/src/heading';
 import List from '@ckeditor/ckeditor5-list/src/list';
 import Bold from '@ckeditor/ckeditor5-basic-styles/src/bold';
 import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic';
+import SimpleBox from './simplebox/simplebox';
 
 
 const editorConfiguration = {
-    plugins: [ Essentials, Bold, Italic, Paragraph, Heading, List ],
+    plugins: [ Essentials, Bold, Italic, Paragraph, Heading, List, SimpleBox ],
     toolbar: [ 'heading', 'bold', 'italic', 'numberedList', 'bulletedList' ]
 };
 
