@@ -5,6 +5,7 @@ export default class SimpleBoxEditing extends Plugin {
     console.log("SimpleBoxEditing#init called");
 
     this.defineSchema();
+    this.defineConverters();
   }
 
   defineSchema() {
@@ -15,11 +16,11 @@ export default class SimpleBoxEditing extends Plugin {
 
       allowWhere: "$block",
     });
-  
+
     schema.register("simpleBoxTitle", {
       isLimit: true,
 
-      allowIn: 'simpleBox',
+      allowIn: "simpleBox",
 
       allowContentOf: "$block",
     });
@@ -27,12 +28,37 @@ export default class SimpleBoxEditing extends Plugin {
     schema.register("simpleBoxDescription", {
       isLimit: true,
 
-      allowIn: 'simpleBox', 
+      allowIn: "simpleBox",
 
       allowContentOf: "$root",
     });
-
   }
 
-  
+  defineConverters() {
+    const { conversion } = this.editor;
+
+    conversion.elementToElement({
+      model: "simpleBox",
+      view: {
+        name: "section",
+        classes: "simple-box",
+      },
+    });
+
+    conversion.elementToElement({
+      model: "simpleBoxTitle",
+      view: {
+        name: "h2",
+        classes: "simple-box-title",
+      },
+    });
+
+    conversion.elementToElement({
+      model: "simpleBoxDescription",
+      view: {
+        name: "div",
+        classes: "simple-box-description",
+      },
+    });
+  }
 }

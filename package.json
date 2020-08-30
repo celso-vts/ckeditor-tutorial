@@ -151,6 +151,7 @@
     ]
   },
   "devDependencies": {
-    "@ckeditor/ckeditor5-dev-webpack-plugin": "^23.2.0"
+    "@ckeditor/ckeditor5-dev-webpack-plugin": "^23.2.0",
+    "@ckeditor/ckeditor5-inspector": "^2.2.0"
   }
 }
