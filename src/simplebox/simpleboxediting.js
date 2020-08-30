@@ -1,6 +1,16 @@
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
 
+import {
+  toWidget,
+  toWidgetEditable,
+} from "@ckeditor/ckeditor5-widget/src/utils";
+import Widget from "@ckeditor/ckeditor5-widget/src/widget";
+
 export default class SimpleBoxEditing extends Plugin {
+  static get requires() {
+    return [Widget];
+  }
+
   init() {
     console.log("SimpleBoxEditing#init called");
 
@@ -35,9 +45,11 @@ export default class SimpleBoxEditing extends Plugin {
   }
 
   defineConverters() {
-    const { conversion } = this.editor;
+    // MODIFIED
+    const conversion = this.editor.conversion;
 
-    conversion.elementToElement({
+    // <simpleBox> converters
+    conversion.for("upcast").elementToElement({
       model: "simpleBox",
       view: {
         name: "section",
@@ -45,19 +57,76 @@ export default class SimpleBoxEditing extends Plugin {
       },
     });
 
-    conversion.elementToElement({
+    conversion.for("dataDowncast").elementToElement({
+      model: "simpleBox",
+      view: {
+        name: "section",
+        classes: "simple-box",
+      },
+    });
+    
+    conversion.for("editingDowncast").elementToElement({
+      model: "simpleBox",
+      view: (modelElement, writer) => {
+        const section = writer.createContainerElement("section", {
+          class: "simple-box",
+        });
+
+        return toWidget(section, writer, { label: "simple box widget" });
+      },
+    });
+
+    // <simpleBoxTitle> converters
+    conversion.for("upcast").elementToElement({
       model: "simpleBoxTitle",
       view: {
         name: "h2",
         classes: "simple-box-title",
       },
     });
+    conversion.for("dataDowncast").elementToElement({
+      model: "simpleBoxTitle",
+      view: {
+        name: "h2",
+        classes: "simple-box-title",
+      },
+    });
+    conversion.for("editingDowncast").elementToElement({
+      model: "simpleBoxTitle",
+      view: (modelElement, writer) => {
+        // Note: You use a more specialized createEditableElement() method here.
+        const h1 = writer.createEditableElement("h2", {
+          class: "simple-box-title",
+        });
 
-    conversion.elementToElement({
+        return toWidgetEditable(h1, writer);
+      },
+    });
+
+    // <simpleBoxDescription> converters
+    conversion.for("upcast").elementToElement({
       model: "simpleBoxDescription",
       view: {
         name: "div",
         classes: "simple-box-description",
+      },
+    });
+    conversion.for("dataDowncast").elementToElement({
+      model: "simpleBoxDescription",
+      view: {
+        name: "div",
+        classes: "simple-box-description",
+      },
+    });
+    conversion.for("editingDowncast").elementToElement({
+      model: "simpleBoxDescription",
+      view: (modelElement, writer) => {
+        // Note: You use a more specialized createEditableElement() method here.
+        const div = writer.createEditableElement("div", {
+          class: "simple-box-description",
+        });
+
+        return toWidgetEditable(div, writer);
       },
     });
   }
