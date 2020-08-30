@@ -14,7 +14,7 @@ import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
 
 const editorConfiguration = {
   plugins: [Essentials, Bold, Italic, Paragraph, Heading, List, SimpleBox],
-  toolbar: ["heading", "bold", "italic", "numberedList", "bulletedList"],
+  toolbar: ["heading", "bold", "italic", "numberedList", "bulletedList", "simpleBox"],
 };
 
 class App extends Component {
