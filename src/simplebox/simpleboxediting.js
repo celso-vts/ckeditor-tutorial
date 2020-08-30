@@ -5,6 +5,7 @@ import {
   toWidgetEditable,
 } from "@ckeditor/ckeditor5-widget/src/utils";
 import Widget from "@ckeditor/ckeditor5-widget/src/widget";
+import InsertSimpleBoxCommand from "./insertsimpleboxcommand";
 
 export default class SimpleBoxEditing extends Plugin {
   static get requires() {
@@ -16,6 +17,11 @@ export default class SimpleBoxEditing extends Plugin {
 
     this.defineSchema();
     this.defineConverters();
+
+    this.editor.commands.add(
+      "insertSimpleBox",
+      new InsertSimpleBoxCommand(this.editor)
+    );
   }
 
   defineSchema() {
@@ -41,6 +47,15 @@ export default class SimpleBoxEditing extends Plugin {
       allowIn: "simpleBox",
 
       allowContentOf: "$root",
+    });
+
+    schema.addChildCheck((context, childDefinition) => {
+      if (
+        context.endsWith("simpleBoxDescription") &&
+        childDefinition.name === "simpleBox"
+      ) {
+        return false;
+      }
     });
   }
 
