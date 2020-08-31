@@ -24,7 +24,7 @@ export default class TagEditing extends Plugin {
       )
     );
     this.editor.config.define("tagConfig", {
-      types: ["date", "first name", "surname"],
+      types: ["commencement date", "base rent", "address"],
     });
   }
 
@@ -74,7 +74,11 @@ export default class TagEditing extends Plugin {
 
     conversion.for("dataDowncast").elementToElement({
       model: "tag",
-      view: createTagView,
+      view: (modelItem, viewWriter) => {
+        const name = modelItem.getAttribute("name");
+        const text = viewWriter.createText("{{" + name + "}}");
+        return text;
+      },
     });
 
     // Helper method for both downcast converters.
@@ -86,7 +90,7 @@ export default class TagEditing extends Plugin {
       });
 
       // Insert the Tag name (as a text).
-      const innerText = viewWriter.createText("{" + name + "}");
+      const innerText = viewWriter.createText("{{" + name + "}}");
       viewWriter.insert(viewWriter.createPositionAt(tagView, 0), innerText);
 
       return tagView;

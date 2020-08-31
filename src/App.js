@@ -15,7 +15,7 @@ import Tag from "./tag/tag";
 
 const editorConfiguration = {
   plugins: [Essentials, Bold, Italic, Paragraph, Heading, List, SimpleBox, Tag],
-  toolbar: ["heading", "bold", "italic", "numberedList", "bulletedList", "simpleBox"],
+  toolbar: ["heading", "bold", "italic", "numberedList", "bulletedList", "simpleBox", "|", "tags"],
 };
 
 class App extends Component {
