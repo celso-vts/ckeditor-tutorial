@@ -11,9 +11,10 @@ import Italic from "@ckeditor/ckeditor5-basic-styles/src/italic";
 import SimpleBox from "./simplebox/simplebox";
 
 import CKEditorInspector from "@ckeditor/ckeditor5-inspector";
+import Tag from "./tag/tag";
 
 const editorConfiguration = {
-  plugins: [Essentials, Bold, Italic, Paragraph, Heading, List, SimpleBox],
+  plugins: [Essentials, Bold, Italic, Paragraph, Heading, List, SimpleBox, Tag],
   toolbar: ["heading", "bold", "italic", "numberedList", "bulletedList", "simpleBox"],
 };
 
