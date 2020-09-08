@@ -1,8 +1,16 @@
-import Widget from '@ckeditor/ckeditor5-widget/src/widget';
-import { toWidget, viewToModelPositionOutsideModelElement } from '@ckeditor/ckeditor5-widget/src/utils';
-
+import Widget from "@ckeditor/ckeditor5-widget/src/widget";
+import {
+  toWidget,
+  viewToModelPositionOutsideModelElement,
+  isWidget,
+} from "@ckeditor/ckeditor5-widget/src/utils";
 import TagCommand from "./tagcommand";
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
+import {
+  MouseEnterObserver,
+  MouseOutObserver,
+  FormikFocusObserver,
+} from "./observers";
 
 export default class TagEditing extends Plugin {
   static get requires() {
@@ -10,8 +18,6 @@ export default class TagEditing extends Plugin {
   }
 
   init() {
-    console.log("TagEditing#init() got called");
-
     this._defineSchema();
     this._defineConverters();
 
@@ -24,8 +30,44 @@ export default class TagEditing extends Plugin {
       )
     );
     this.editor.config.define("tagConfig", {
-      types: ["commencement date", "base rent", "address"],
+      types: ["commencement_date", "base_rent", "address"],
     });
+
+    this.editor.editing.view.addObserver(MouseEnterObserver);
+    this.editor.editing.view.addObserver(MouseOutObserver);
+    this.editor.editing.view.addObserver(FormikFocusObserver);
+
+    const tagHoverHandler = (event, data) => {
+      const target = data.target;
+      if (isWidget(target)) {
+        const dataPath = target.getAttribute("data-path");
+        if (dataPath) {
+          const customEvent = new CustomEvent("taghover", {
+            detail: { dataPath },
+          });
+          window.dispatchEvent(customEvent);
+        }
+      } else {
+        const customEvent = new CustomEvent("taghover", {
+          detail: { dataPath: null },
+        });
+        window.dispatchEvent(customEvent);
+      }
+    };
+
+    this.listenTo(
+      this.editor.editing.view.document,
+      "mouseover",
+      tagHoverHandler
+    );
+
+    this.listenTo(
+      this.editor.editing.view.document,
+      "mouseout",
+      tagHoverHandler
+    );
+
+    this.listenTo(window, "formik:focus", console.log);
   }
 
   _defineSchema() {
@@ -42,7 +84,7 @@ export default class TagEditing extends Plugin {
       isObject: true,
 
       // The Tag can have many types, like date, name, surname, etc:
-      allowAttributes: ["name"],
+      allowAttributes: ["name", "data-path"],
     });
   }
 
@@ -53,12 +95,13 @@ export default class TagEditing extends Plugin {
       view: {
         name: "span",
         classes: ["tag"],
+        "data-path": "test",
       },
       model: (viewElement, modelWriter) => {
         // Extract the "name" from "{name}".
         const name = viewElement.getChild(0).data.slice(1, -1);
 
-        return modelWriter.createElement("tag", { name });
+        return modelWriter.createElement("tag", { name, "data-path": name });
       },
     });
 
@@ -87,6 +130,7 @@ export default class TagEditing extends Plugin {
 
       const tagView = viewWriter.createContainerElement("span", {
         class: "tag",
+        "data-path": name,
       });
 
       // Insert the Tag name (as a text).
