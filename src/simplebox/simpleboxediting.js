@@ -9,140 +9,131 @@ import InsertSimpleBoxCommand from "./insertsimpleboxcommand";
 
 export default class SimpleBoxEditing extends Plugin {
   static get requires() {
-    return [Widget];
+      return [ Widget ];
   }
 
   init() {
-    console.log("SimpleBoxEditing#init called");
+      console.log( 'SimpleBoxEditing#init() got called' );
 
-    this.defineSchema();
-    this.defineConverters();
+      this._defineSchema();
+      this._defineConverters();
 
-    this.editor.commands.add(
-      "insertSimpleBox",
-      new InsertSimpleBoxCommand(this.editor)
-    );
+      this.editor.commands.add( 'insertSimpleBox', new InsertSimpleBoxCommand( this.editor ) );
   }
 
-  defineSchema() {
-    const { schema } = this.editor.model;
+  _defineSchema() {
+      const schema = this.editor.model.schema;
 
-    schema.register("simpleBox", {
-      isObject: true,
+      schema.register( 'simpleBox', {
+          // Behaves like a self-contained object (e.g. an image).
+          isObject: true,
 
-      allowWhere: "$block",
-    });
+          // Allow in places where other blocks are allowed (e.g. directly in the root).
+          allowWhere: '$block'
+      } );
 
-    schema.register("simpleBoxTitle", {
-      isLimit: true,
+      schema.register( 'simpleBoxTitle', {
+          // Cannot be split or left by the caret.
+          isLimit: true,
 
-      allowIn: "simpleBox",
+          allowIn: 'simpleBox',
 
-      allowContentOf: "$block",
-    });
+          // Allow content which is allowed in blocks (i.e. text with attributes).
+          allowContentOf: '$block'
+      } );
 
-    schema.register("simpleBoxDescription", {
-      isLimit: true,
+      schema.register( 'simpleBoxDescription', {
+          // Cannot be split or left by the caret.
+          isLimit: true,
 
-      allowIn: "simpleBox",
+          allowIn: 'simpleBox',
 
-      allowContentOf: "$root",
-    });
+          // Allow content which is allowed in the root (e.g. paragraphs).
+          allowContentOf: '$root'
+      } );
 
-    schema.addChildCheck((context, childDefinition) => {
-      if (
-        context.endsWith("simpleBoxDescription") &&
-        childDefinition.name === "simpleBox"
-      ) {
-        return false;
-      }
-    });
+      schema.addChildCheck( ( context, childDefinition ) => {
+          if ( context.endsWith( 'simpleBoxDescription' ) && childDefinition.name == 'simpleBox' ) {
+              return false;
+          }
+      } );
   }
 
-  defineConverters() {
-    // MODIFIED
-    const conversion = this.editor.conversion;
+  _defineConverters() {
+      const conversion = this.editor.conversion;
 
-    // <simpleBox> converters
-    conversion.for("upcast").elementToElement({
-      model: "simpleBox",
-      view: {
-        name: "section",
-        classes: "simple-box",
-      },
-    });
+      // <simpleBox> converters
+      conversion.for( 'upcast' ).elementToElement( {
+          model: 'simpleBox',
+          view: {
+              name: 'section',
+              classes: 'simple-box'
+          }
+      } );
+      conversion.for( 'dataDowncast' ).elementToElement( {
+          model: 'simpleBox',
+          view: {
+              name: 'section',
+              classes: 'simple-box'
+          }
+      } );
+      conversion.for( 'editingDowncast' ).elementToElement( {
+          model: 'simpleBox',
+          view: ( modelElement, { writer: viewWriter } ) => {
+              const section = viewWriter.createContainerElement( 'section', { class: 'simple-box' } );
 
-    conversion.for("dataDowncast").elementToElement({
-      model: "simpleBox",
-      view: {
-        name: "section",
-        classes: "simple-box",
-      },
-    });
-    
-    conversion.for("editingDowncast").elementToElement({
-      model: "simpleBox",
-      view: (modelElement, writer) => {
-        const section = writer.createContainerElement("section", {
-          class: "simple-box",
-        });
+              return toWidget( section, viewWriter, { label: 'simple box widget' } );
+          }
+      } );
 
-        return toWidget(section, writer, { label: "simple box widget" });
-      },
-    });
+      // <simpleBoxTitle> converters
+      conversion.for( 'upcast' ).elementToElement( {
+          model: 'simpleBoxTitle',
+          view: {
+              name: 'h1',
+              classes: 'simple-box-title'
+          }
+      } );
+      conversion.for( 'dataDowncast' ).elementToElement( {
+          model: 'simpleBoxTitle',
+          view: {
+              name: 'h1',
+              classes: 'simple-box-title'
+          }
+      } );
+      conversion.for( 'editingDowncast' ).elementToElement( {
+          model: 'simpleBoxTitle',
+          view: ( modelElement, { writer: viewWriter } ) => {
+              // Note: You use a more specialized createEditableElement() method here.
+              const h1 = viewWriter.createEditableElement( 'h1', { class: 'simple-box-title' } );
 
-    // <simpleBoxTitle> converters
-    conversion.for("upcast").elementToElement({
-      model: "simpleBoxTitle",
-      view: {
-        name: "h2",
-        classes: "simple-box-title",
-      },
-    });
-    conversion.for("dataDowncast").elementToElement({
-      model: "simpleBoxTitle",
-      view: {
-        name: "h2",
-        classes: "simple-box-title",
-      },
-    });
-    conversion.for("editingDowncast").elementToElement({
-      model: "simpleBoxTitle",
-      view: (modelElement, writer) => {
-        // Note: You use a more specialized createEditableElement() method here.
-        const h1 = writer.createEditableElement("h2", {
-          class: "simple-box-title",
-        });
+              return toWidgetEditable( h1, viewWriter );
+          }
+      } );
 
-        return toWidgetEditable(h1, writer);
-      },
-    });
+      // <simpleBoxDescription> converters
+      conversion.for( 'upcast' ).elementToElement( {
+          model: 'simpleBoxDescription',
+          view: {
+              name: 'div',
+              classes: 'simple-box-description'
+          }
+      } );
+      conversion.for( 'dataDowncast' ).elementToElement( {
+          model: 'simpleBoxDescription',
+          view: {
+              name: 'div',
+              classes: 'simple-box-description'
+          }
+      } );
+      conversion.for( 'editingDowncast' ).elementToElement( {
+          model: 'simpleBoxDescription',
+          view: ( modelElement, { writer: viewWriter } ) => {
+              // Note: You use a more specialized createEditableElement() method here.
+              const div = viewWriter.createEditableElement( 'div', { class: 'simple-box-description' } );
 
-    // <simpleBoxDescription> converters
-    conversion.for("upcast").elementToElement({
-      model: "simpleBoxDescription",
-      view: {
-        name: "div",
-        classes: "simple-box-description",
-      },
-    });
-    conversion.for("dataDowncast").elementToElement({
-      model: "simpleBoxDescription",
-      view: {
-        name: "div",
-        classes: "simple-box-description",
-      },
-    });
-    conversion.for("editingDowncast").elementToElement({
-      model: "simpleBoxDescription",
-      view: (modelElement, writer) => {
-        // Note: You use a more specialized createEditableElement() method here.
-        const div = writer.createEditableElement("div", {
-          class: "simple-box-description",
-        });
-
-        return toWidgetEditable(div, writer);
-      },
-    });
+              return toWidgetEditable( div, viewWriter );
+          }
+      } );
   }
 }

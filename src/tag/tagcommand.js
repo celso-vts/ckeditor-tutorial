@@ -1,27 +1,23 @@
 import Command from "@ckeditor/ckeditor5-core/src/command";
 
 export default class TagCommand extends Command {
-  execute( { value } ) {
-      const editor = this.editor;
+  execute({ value }) {
+    const { editor } = this;
 
-      editor.model.change( writer => {
-          // Create a <Tag> elment with the "name" attribute...
-          const tag = writer.createElement( 'tag', { name: value } );
+    editor.model.change((writer) => {
+      const tag = writer.createElement("tag", { name: value });
 
-          // ... and insert it into the document.
-          editor.model.insertContent( tag );
-
-          // Put the selection on the inserted element.
-          writer.setSelection( tag, 'on' );
-      } );
+      editor.model.insertContent(tag);
+      writer.setSelection(tag, "on");
+    });
   }
 
   refresh() {
-      const model = this.editor.model;
-      const selection = model.document.selection;
+    const { model } = this.editor;
+    const { selection } = model.document;
 
-      const isAllowed = model.schema.checkChild( selection.focus.parent, 'tag' );
+    const isAllowed = model.schema.checkChild(selection.focus.parent, "tag");
 
-      this.isEnabled = isAllowed;
+    this.isEnabled = isAllowed;
   }
 }

@@ -1,5 +1,5 @@
 import Plugin from "@ckeditor/ckeditor5-core/src/plugin";
-import { addListToDropdown, createDropdown } from '@ckeditor/ckeditor5-ui/src/dropdown/utils';
+import { addListToDropdown, createDropdown } from "@ckeditor/ckeditor5-ui/src/dropdown/utils";
 
 import Model from "@ckeditor/ckeditor5-ui/src/model";
 import Collection from "@ckeditor/ckeditor5-utils/src/collection";
@@ -9,7 +9,7 @@ export default class TagUI extends Plugin {
     const { editor } = this;
     const { t } = editor;
 
-    const tags = editor.config.get('tagConfig.types');
+    const tags = editor.config.get("tagConfig.tags");
 
     editor.ui.componentFactory.add("tags", (locale) => {
       const dropdownView = createDropdown(locale);
@@ -23,6 +23,7 @@ export default class TagUI extends Plugin {
       });
 
       const command = editor.commands.get("tag");
+
       dropdownView.bind("isEnabled").to(command);
 
       this.listenTo(dropdownView, "execute", (event) => {
@@ -47,7 +48,9 @@ function getDropdownItemsDefinition(tags) {
         withText: true,
       }),
     };
+
     itemDefinitions.add(definition);
   }
+
   return itemDefinitions;
 }
