@@ -1,0 +1,1 @@
+Source code from https://ckeditor.com/docs/ckeditor5/latest/framework/guides/deep-dive/ui/custom-editor-creator.html

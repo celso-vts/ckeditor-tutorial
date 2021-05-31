@@ -1,12 +1,12 @@
 import EditorUI from "@ckeditor/ckeditor5-core/src/editor/editorui";
 import enableToolbarKeyboardFocus from "@ckeditor/ckeditor5-ui/src/toolbar/enabletoolbarkeyboardfocus";
-import normalizeToolbarConfig from "@ckeditor/ckeditor5-ui/src/toolbar/normalizetoolbarconfig";
 import { enablePlaceholder } from "@ckeditor/ckeditor5-engine/src/view/placeholder";
 
 /**
- * The multi-root editor UI class.
+ * The multi-root editor UI view. It is a virtual view providing an inline editable, but without
+ * any specific arrangement of the components in the DOM.
  *
- * @extends module:core/editor/editorui~EditorUI
+ * @extends module:ui/editorui/editoruiview~EditorUIView
  */
 export class MultirootEditorUI extends EditorUI {
   /**
@@ -25,14 +25,6 @@ export class MultirootEditorUI extends EditorUI {
      * @member {module:ui/editorui/editoruiview~EditorUIView} #view
      */
     this.view = view;
-
-    /**
-     * A normalized `config.toolbar` object.
-     *
-     * @type {Object}
-     * @private
-     */
-    this._toolbarConfig = normalizeToolbarConfig(editor.config.get("toolbar"));
   }
 
   /**
@@ -52,16 +44,13 @@ export class MultirootEditorUI extends EditorUI {
     // (especially inputs) but the editable remains the "focus context" (e.g. link balloon
     // attached to a link in an editable). In this case, the editable should preserve visual
     // focus styles.
-    this.focusTracker.on(
-      "change:focusedElement",
-      (evt, name, focusedElement) => {
-        for (const editable of this.view.editables) {
-          if (editable.element === focusedElement) {
-            lastFocusedEditableElement = editable.element;
-          }
+    this.focusTracker.on("change:focusedElement", (evt, name, focusedElement) => {
+      for (const editable of this.view.editables) {
+        if (editable.element === focusedElement) {
+          lastFocusedEditableElement = editable.element;
         }
       }
-    );
+    });
 
     // If the focus tracker loses focus, stop tracking the last focused editable element.
     // Wherever the focus is restored, it will no longer be in the context of that editable
@@ -160,7 +149,7 @@ export class MultirootEditorUI extends EditorUI {
     const view = this.view;
     const toolbar = view.toolbar;
 
-    toolbar.fillFromConfig(this._toolbarConfig.items, this.componentFactory);
+    toolbar.fillFromConfig(editor.config.get("toolbar"), this.componentFactory);
 
     enableToolbarKeyboardFocus({
       origin: editor.editing.view,
@@ -184,7 +173,7 @@ export class MultirootEditorUI extends EditorUI {
       const sourceElement = this.getEditableElement(editable.name);
 
       const placeholderText =
-        (editor.config.get("placeholder")||{})[editable.name] ||
+        editor.config.get("placeholder")[editable.name] ||
         (sourceElement &&
           sourceElement.tagName.toLowerCase() === "textarea" &&
           sourceElement.getAttribute("placeholder"));
@@ -195,6 +184,7 @@ export class MultirootEditorUI extends EditorUI {
           element: editingRoot,
           text: placeholderText,
           isDirectHost: false,
+          keepOnFocus: true,
         });
       }
     }

@@ -5,7 +5,6 @@
 
 import React from "react";
 import PropTypes from "prop-types";
-
 export class CKEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -30,6 +29,9 @@ export class CKEditor extends React.Component {
     }
 
     if (this._shouldUpdateContent(nextProps)) {
+      // Removing / adding roots dynamically is not supported yet
+
+      // https://github.com/ckeditor/ckeditor5/issues/6291
       this.editor.setData(nextProps.data);
     }
 
